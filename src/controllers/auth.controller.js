@@ -1,6 +1,7 @@
 // const TodoModel = require("../models/todo.model");
 const mongoose = require("mongoose");
 const User = require("../models/user.model");
+const bcrypt = require("bcrypt");
 
 class AuthController {
   async register(req, res, next) {
@@ -66,9 +67,53 @@ class AuthController {
     // Get variables for the login process
     const { email } = req.body;
     try {
+      // check if user exists
+      const user = await User.findOne({ email: email }).select("+password");
+      if (!user)
+        return res.status(401).json({
+          status: "failed",
+          data: [],
+          message:
+            "Invalid email or password. Please try again with the correct credentials.",
+        });
+
+      // if user exists
+      // validate password
+      const isPasswordValid = bcrypt.compareSync(
+        `${req.body.password}`,
+        user.password
+      );
+
+      // if not valid, return unathorized response
+      if (!isPasswordValid)
+        return res.status(401).json({
+          status: "failed",
+          data: [],
+          message:
+            "Invalid email or password. Please try again with the correct credentials.",
+        });
+
+      let option = {
+        maxAge: 20 * 60 * 1000, // would expire in 20minutes
+        httpOnly: true, // The cookie only accessible by the web server
+        secure: true, // The cookie only accessible by
+        sameSite: "none",
+      };
+
+      const token = user.generateAccessJWT();
+      res.cookie("token", token, option); // options is optional
+
+      // return user info except password
+      const { password, ...user_data } = user._doc;
+      res.status(200).json({
+        status: "success",
+        data: [user_data],
+        message: "You have successfully logged in.",
+      });
     } catch (err) {
       next(err);
     }
+    res.end();
   }
 }
 
