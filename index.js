@@ -5,6 +5,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const rfs = require("rotating-file-stream");
 const path = require("path");
+const cookieParser = require("cookie-parser");
 
 const connectDatabase = require("./src/configs/db.config.js");
 
@@ -20,6 +21,9 @@ const routes = require("./src/routes/routes.js");
 
 app.use(helmet());
 app.use(cors());
+app.disable("x-powered-by"); //Reduce fingerprinting
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Your API routes
