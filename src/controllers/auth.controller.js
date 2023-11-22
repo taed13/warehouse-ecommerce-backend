@@ -20,6 +20,7 @@ class AuthController {
       city,
       zip_code,
       phone_number,
+      role,
     } = req.body;
 
     try {
@@ -38,6 +39,7 @@ class AuthController {
         city,
         zip_code,
         phone_number,
+        role,
       });
       // Check if user already exists
       const existingUser = await User.findOne({ email });
@@ -50,7 +52,7 @@ class AuthController {
         });
 
       const savedUser = await newUser.save(); // save new user into the database
-      const { password: savedPassword, role, ...user_data } = savedUser._doc;
+      const { password: savedPassword, ...user_data } = savedUser._doc;
       res.status(200).json({
         status: "success",
         data: [user_data],
