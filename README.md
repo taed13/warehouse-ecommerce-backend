@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a project for managing a book directory. It includes features such as [list features or functionalities].
+Warehouse management system integrated with e-commerce functionalities for streamlined inventory control.
 
 ## Installation
 
