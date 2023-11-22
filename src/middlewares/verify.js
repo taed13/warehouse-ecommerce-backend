@@ -8,9 +8,19 @@ const Verify = (req, res, next) => {
     const authHeader = req.headers["cookie"]; // get the session cookie from request header
     if (!authHeader) return res.sendStatus(401); // if there is no cookie from request header, send an unauthorized response.
     const cookie = authHeader.split("=")[1]; // If there is, split the cookie string to get the actual jwt
+    const accessToken = cookie.split(";")[0];
+    const checkIfBlackListed = Blacklist.findOne({ token: accessToken }); // check if that token is blacklisted
+    // If there is, return 401 unauthorized response
+    if (checkIfBlackListed)
+      return res.status(401).json({
+        status: "failed",
+        data: [],
+        message: "This session has expired. Please login",
+      });
 
+    // if token is not blacklisted, verify with jwt to see if it has been tampered with or not.
     // xác minh bằng cách sử dụng jwt để xem liệu mã có bị hết hạn hay giả mạo không
-    // kiểm tra tính toàn vẹn của cookie
+    // that's like checking the integrity of the accessToken
     jwt.verify(
       cookie,
       process.env.SECRET_ACCESS_TOKEN,
