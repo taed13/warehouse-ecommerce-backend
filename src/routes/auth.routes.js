@@ -48,6 +48,9 @@ router.post(
   AuthController.login
 );
 
+// Logout route ==> /api/auth/logout
+router.get("/logout", AuthController.logout);
+
 router.get("/", (req, res) => {
   res.json({
     message: "HOME API AUTH ROUTER",
